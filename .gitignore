@@ -2,3 +2,4 @@
 trials/*
 !trials/.gitkeep
 outputs
+*json
