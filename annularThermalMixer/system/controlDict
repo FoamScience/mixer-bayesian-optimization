@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
+|  \\    /   O peration     | Version:  v2312                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         2;
+endTime         1;
 
 deltaT          1e-3;
 
@@ -48,5 +48,56 @@ adjustTimeStep  yes;
 
 maxCo           1;
 
+functions
+{
+    mixingQuality
+    {
+        // Mandatory entries (unmodifiable)
+        type            volFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (alphat);
+        operation       CoV;
+        regionType      all;
+        writeFields     true;
+        writeControl    writeTime;
+    }
+
+    powerConsumption
+    {
+        type            propellerInfo;
+        libs            (forces);
+        writeControl    writeTime;
+        patches         (movingWalls);
+        URef            1; // Function1 type; 'constant' form shown here
+        rho             rhoInf; // incompressible
+        rhoInf          1;
+
+        // Optionally write propeller performance data
+        writePropellerPerformance yes;
+
+        // Propeller data:
+        // Radius
+        radius          0.025;
+        rotationMode    specified; // specified | MRF
+        // rotationMode = specified:
+        origin          (0 0 0);
+        n               25; // revolutions per second = rad/s / 2pi
+        axis            (0 0 1);
+        // Optionally write wake text files
+        // Note: controlled by writeControl
+        writeWakeFields no;
+    }
+
+    erosion
+    {
+        type        wallShearStress;
+        libs        (fieldFunctionObjects);
+        patches     (movingWalls); // (wall1 "(wall2|wall3)");
+        writeFields     true;
+        writeControl    writeTime;
+    }
+}
 
 // ************************************************************************* //
