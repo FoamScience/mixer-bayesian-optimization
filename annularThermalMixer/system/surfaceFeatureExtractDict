@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
+|  \\    /   O peration     | Version:  v2312                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -14,27 +14,27 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-AMI.obj
+AMI.stl
 {
     #include "surfaceFeatureExtractDictDefaults"
 }
 
-shaft.obj
+shaft.stl
 {
     #include "surfaceFeatureExtractDictDefaults"
 }
 
-wall.obj
+wall.stl
 {
     #include "surfaceFeatureExtractDictDefaults"
 }
 
-statorBlades.obj
+statorBlades.stl
 {
     #include "surfaceFeatureExtractDictDefaults"
 }
 
-rotorBlades.obj
+rotorBlades.stl
 {
     #include "surfaceFeatureExtractDictDefaults"
 }

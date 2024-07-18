@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
+|  \\    /   O peration     | Version:  v2312                                 |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -20,55 +20,55 @@ addLayers       false;
 
 geometry
 {
-    AMI.obj
+    AMI.stl
     {
         type        triSurfaceMesh;
         name        AMI;
     }
 
-    innerInlet.obj
+    innerInlet.stl
     {
         type        triSurfaceMesh;
         name        innerInlet;
     }
 
-    outerInlet.obj
+    outerInlet.stl
     {
         type        triSurfaceMesh;
         name        outerInlet;
     }
 
-    innerOutlet.obj
+    innerOutlet.stl
     {
         type        triSurfaceMesh;
         name        innerOutlet;
     }
 
-    outerOutlet.obj
+    outerOutlet.stl
     {
         type        triSurfaceMesh;
         name        outerOutlet;
     }
 
-    rotorBlades.obj
+    rotorBlades.stl
     {
         type        triSurfaceMesh;
         name        rotorBlades;
     }
 
-    shaft.obj
+    shaft.stl
     {
         type        triSurfaceMesh;
         name        shaft;
     }
 
-    statorBlades.obj
+    statorBlades.stl
     {
         type        triSurfaceMesh;
         name        statorBlades;
     }
 
-    wall.obj
+    wall.stl
     {
         type        triSurfaceMesh;
         name        walls;
