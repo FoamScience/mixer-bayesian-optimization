@@ -1,0 +1,4 @@
+*.eMesh
+trials/*
+!trials/.gitkeep
+outputs
