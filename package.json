@@ -1,5 +1,0 @@
-{
-    "dependencies": {
-        "openfoam-apptainer-packaging": "git+https://github.com/FoamScience/openfoam-apptainer-packaging"
-    }
-}
