@@ -1,0 +1,45 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2312                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      cadSettings;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+shaft
+{
+    radius 0.0125;
+    height 0.2;
+}
+
+stator
+{
+    blades
+    {
+        radius 0.02;
+        height 0.2;
+        distanceFromCenter 0.09;
+        n 4;
+    }
+}
+
+rotor
+{
+    blades
+    {
+        radius 0.0125;
+        height 0.04;
+        tiltAngle 15; // [0, 90] but subject to constrains related to blade height & shaft radius
+        n 4;
+    }
+}
+
+// ************************************************************************* //
