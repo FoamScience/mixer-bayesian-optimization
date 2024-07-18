@@ -32,7 +32,7 @@ problem:
     rotorBladeTiltAngle:
       type: range
       value_type: float
-      bounds: [0, 25] # some of these angles will not be feasible
+      bounds: [0, 15] # some of these angles will not be feasible
       log_scale: False
   # Parameters can be substituted per-file
   scopes:
