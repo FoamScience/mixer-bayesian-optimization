@@ -11,3 +11,4 @@ settings = ParsedParameterFile(name="./constant/caseSettings")
 
 control["functions"]["powerConsumption"]["radius"] = cad["shaft"]["radius"] + cad["rotor"]["blades"]["radius"]
 control["functions"]["powerConsumption"]["n"] = settings["meshMotionProperties"]["omega"] / (2*math.pi)
+control.writeFile()

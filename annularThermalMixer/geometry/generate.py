@@ -70,7 +70,7 @@ def gen_rotor_blades():
     x = cadDict["shaft"]["radius"]+cadDict["rotor"]["blades"]["radius"]
     max_angle = math.degrees(math.atan(cadDict["shaft"]["radius"]/z))
     if cadDict["rotor"]["blades"]["tiltAngle"] < 0 or cadDict["rotor"]["blades"]["tiltAngle"] > max_angle:
-        raise Exception(f"Rotation around X for rotator blades exceeds the feasible max angle: {max_angle:.2f}")
+        raise Exception(f"Rotation around X for rotor blades exceeds the feasible max angle: {max_angle:.2f}")
     r_blades = []
     for i in range(n_blades):
         print(f"rotating by {math.degrees(angle_on_oz*i)}")
