@@ -2,4 +2,4 @@ numpy-stl>=3.1.1
 ply>=3.11
 pyfoam>=2023.7
 git+https://github.com/jimy-byerley/pymadcad@master#egg=pymadcad
-foambo>=0.0.8
+foambo>=0.1.0

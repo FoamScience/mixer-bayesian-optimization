@@ -34,7 +34,6 @@ problem:
       value_type: float
       bounds: [0, 15] # some of these angles will not be feasible
       log_scale: False
-  # Parameters can be substituted per-file
   scopes:
     "/constant/caseSettings":
       angularVelocity: "meshMotionProperties.omega"
@@ -121,6 +120,21 @@ meta:
     min_trials: 25
     # How many trials to consider for computing the improvement probability
     window_size: 10
+
+validate:
+  cross_validate: True # Run Ax's cross validation (doesn't run new trials)
+  # Extra trials to run for validation
+  trials:
+    - angularVelocity: 50
+      nRotorBlades: 5
+      rotorBladeRadius: 0.0161
+      rotorBladeHeight: 0.0374
+      rotorBladeTiltAngle: 7.37
+  # Generate pareto-frontier points and run them for validation
+  # Only works if it's a multi-objective optimization
+  pareto_frontier: 5
+  primary_objective: "MixingQuality"
+  secondary_objective: "BladeDurability"
 
 visualize:
   # How often to update foamDash graphs
