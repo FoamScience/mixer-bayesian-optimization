@@ -20,6 +20,21 @@ foamBO
 # by rendering results, set:
 export IMGBB_API_KEY=<your-api-key-from-imgbb.com>
 foamDash
+# Get some cross validation, trade-off and contour plots
+foamValidateBO
+```
+
+```bash
+git clone https://github.com/FoamScience/openfoam-apptainer-packaging /tmp/of_tainers
+git clone https://github.com/FoamScience/mixer-bayesian-optimization
+cd mixer-bayesian-optimization
+ansible-playbook /tmp/of_tainers/build.yaml --extra-vars="original_dir=$PWD" --extra-vars="@build/config.yaml"
+apptainer run containers/projects/thermal_mixer.sif "foamBO"
+# to monitor how the simulations are going:
+export IMGBB_API_KEY="<your-key>"
+apptainer run containers/projects/thermal_mixer.sif "foamDash"
+# and then
+apptainer run containers/projects/thermal_mixer.sif "foamValidateBO"
 ```
 
 ## Q&As
@@ -38,8 +53,8 @@ That's 2464 hours (a 100 days) of simulating the coarse `annularThermalMixer` ca
 
 #### 1.1 Trials-to-"convergence" for the Bayesian optimization algorithm
 
-With 70 max trials (4 max parallel trials), the `BOTorch` algorithm convergence in **65 trials**.
-One nice feature of Bayesian Algorithms is that the stopping strategy can shifted from
+With 70 max trials (4 max parallel trials), the `BOTorch` algorithm converges in **65 trials**.
+One nice feature of Bayesian Algorithms is that the stopping strategy can be shifted from
 objective values over to the **probability of improving on current best optima estimations**.
 ```yaml
 meta:
@@ -59,9 +74,22 @@ after the initial SOBOL runs. A while later it lowers to 3. Looking at objective
 the framework did a decent job in picking a good parallel trials number to increase efficiency but
 not sacrificing much parameter space discovery.
 
-#### 1.3 How sensitive the convergence time is to adding a continuous-value parameter to the search space
+#### 1.3 How sensitive the convergence time is to adding another parameter to the search space
 
-> TODO: formulate an opinion
+By adding a `choice` parameter with 6 possible values - which extends the search space to 88.7k
+brute-force cases - the optimization algorithm takes only few more trials to converge under the
+same conditions. It should be noted that the added parameter was not more significant to any
+of the objectives than the existing ones:
+```yaml
+nStatorBlades:
+  type: choice
+  value_type: int
+  values: [3, 4, 5, 6, 7, 8]
+  is_ordered: True
+```
+
+For this optimization case, adding a `range` parameter of some significance to at least one
+the objectives can be expected to increase time-to-convergence by 10-15 trials.
 
 ## Necessary changes to the OpenFOAM case
 
@@ -168,5 +196,8 @@ three trials if configured to do so:
 
 ## Next steps
 
-Implementation some validation mechanism in `foamBO`. Picking a set of parameters close to the Pareto Frontier
-and actually simulating it might be useful in boosting users confidence in their results.
+Validation trials were also performed to evaluate how well the surrogate model can predict outcomes
+without actually running case, and it does pretty well around frontier points.
+
+Unfortunately Ax only supports linear parameter constraints so we have to look for other ways to enforce
+the relationship between the tilting angle and height of the blades with the shaft radius.
