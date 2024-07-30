@@ -1,28 +1,38 @@
-# Bayesian Optimization of an annular thermal mixer with OpenFOAM and foamBO
+# Bayesian Optimization of an Annular Thermal Mixer with `OpenFOAM` and `foamBO`
 
 ![OpenFOAM Badge](https://img.shields.io/badge/uses-openfoam-blue?style=for-the-badge&logo=cpp)
 ![FoamBO Badge](https://img.shields.io/badge/optimizes_with-foamBO-green?style=for-the-badge&logo=cpp)
 
 
-A WIP demonstration (PoC) repository on how to use `foamBO` to run Bayesian Optimization
-algorithms on OpenFOAM cases.
+A WIP demonstration (PoC) repository on how to use `foamBO` to run 
+Multi-objective Bayesian Optimization algorithms on OpenFOAM cases.
 
 ## Requirements and running
 
-Take a look at `config.yaml` for the parameter set and objective functions.
+Take a look at `config.yaml` for the **parameter set** and **objective functions**,
+they should be self-explanatory.
+
+To run an optimization study:
 
 ```bash
 pip install -r requirements.txt # is a good idea
-# You also need to have ParaView 5.10 or later (for pvpython)
-# To start the optimization study:
+# You also need to have ParaView 5.10 or later (for pvpython),
+# otherwise objective function values cannot be computed.
+
+# To start the optimization study, run:
 foamBO
-# If you want to monitor trials as they complete;
+# If you want to monitor trials as they complete,
 # by rendering results, set:
 export IMGBB_API_KEY=<your-api-key-from-imgbb.com>
 foamDash
 # Get some cross validation, trade-off and contour plots
 foamValidateBO
+# Note: foamDash and foamValidateBO will open browser tabs to render the plots in.
+# If you run in a container, the HTML files will silently be written to disk
 ```
+
+If you don't want to bloat your local system with the few hundreds of Python packages
+this will install, you're welcome to build an `apptainer` container and use it instead:
 
 ```bash
 git clone https://github.com/FoamScience/openfoam-apptainer-packaging /tmp/of_tainers
@@ -32,6 +42,7 @@ ansible-playbook /tmp/of_tainers/build.yaml --extra-vars="original_dir=$PWD" --e
 apptainer run containers/projects/thermal_mixer.sif "foamBO"
 # to monitor how the simulations are going:
 export IMGBB_API_KEY="<your-key>"
+# It's important that apptainer picks up the env. vars., so don't pass -C here
 apptainer run containers/projects/thermal_mixer.sif "foamDash"
 # and then
 apptainer run containers/projects/thermal_mixer.sif "foamValidateBO"
@@ -39,17 +50,21 @@ apptainer run containers/projects/thermal_mixer.sif "foamValidateBO"
 
 ## Q&As
 
+> [!WARNING]
+> The following insights are from runs of the optimization that had a bug in Power Consumption
+> evaluation, and I left it on purpose :scream:.
+
 ### 1. How many case runs do we need to reach a conclusion?
 
 If one considers some increments to represent the minimal change in a parameter value that
 might result in a considerable effect on the objective functions, we get 14784 total brute-force cases:
-- `angularVelicity`: range (20, 50), increment 5 -> 7 values
+- `angularVelocity`: range (20, 50), increment 5 -> 7 values
 - `nRotorBlades`: range (3, 6) -> 4 values
 - `rotorBladeRadius`: range (0.01, 0.02), increment 0.002 -> 6 values
 - `rotorBladeHeight`: range (0.03, 0.05), increment 0.002 -> 11 values
 - `rotorBladeTiltAngle`: range (0, 15), increment 2 -> 8 values
 
-That's 2464 hours (a 100 days) of simulating the coarse `annularThermalMixer` case.
+That's 2464 hours (100 days) of simulating the coarse `annularThermalMixer` case.
 
 #### 1.1 Trials-to-"convergence" for the Bayesian optimization algorithm
 
@@ -70,9 +85,10 @@ meta:
 #### 1.2 Parallel trials vs total trial number trade-off 
 
 The Ax framework starts `BOTorch` with 4 parallel trials, but then increases this number to 5
-after the initial SOBOL runs. A while later it lowers to 3. Looking at objective functions' values,
+after the initial SOBOL runs. A while later it lowers it to 3. Looking at objective functions' values,
 the framework did a decent job in picking a good parallel trials number to increase efficiency but
-not sacrificing much parameter space discovery.
+not sacrificing much parameter space discovery. So, the initial number of parallel trials the user provides
+acts only as a guide, and it's then managed automatically.
 
 #### 1.3 How sensitive the convergence time is to adding another parameter to the search space
 
@@ -143,7 +159,7 @@ the scalar values results in better objectives.
 ### First run: Sensitivity to proper representation of the objective functions
 
 The first run of the optimization algorithm featured the **total surface area** of the blade regions
-where the shear stress squared is more than 70% of its range as an objective function.
+where the shear stress squared is more than 70% of its range as an **objective function**.
 
 Out of the 15 requested Pareto Frontier points, 12 suggested 3 blades (the minimal blade count)
 which, obviously, doesn't bode well with the fact that more blades usually means better mixing quality.
@@ -155,15 +171,15 @@ note that at the time of computing the Pareto Frontier, the algorithm was nowher
 **Solution:** Weigh this objective value with either the total impeller surface, or number of blades.
 
 Out of the 30 tried trials, 18 were completed. The failed trials featured only blades count of 3 and 6, which
-is also related to `rotorBladeRadius` and `rotorBladeHeight`. I made peace with this fact, because otherwise
-I will need to setup dependencies between parameters, which can give not-so-trivial-to-analyse results.
+is also related to the shaft's radius and `rotorBladeHeight`. I made peace with this fact, because otherwise
+I will need to linearize this constraint between parameters, which can be a pain.
 For now, these trials fail, and we know why most of them do. The failed trials feature no other correlations,
 30 trials (with 18 completing) is just not enough:
 
 ![](plots/Mixer_failed_trials.png)
 
-> What's more concerning is the algorithm's (SAASBO) insistence on trying around failing parameter sets.
-> Because we don't have huge search spaces, yet It's better to opt out of SAASBO in favor of something
+> What's more concerning is the algorithm's (SAASBO) insistence on trying **around** failing parameter sets.
+> Because we don't have huge search spaces, yet, It's better to opt out of SAASBO in favor of something
 > like BOTorch or GPEI
 
 A clear indication of the quality of optimization results is the uncertainty around Pareto Frontier points.
@@ -197,7 +213,7 @@ three trials if configured to do so:
 ## Next steps
 
 Validation trials were also performed to evaluate how well the surrogate model can predict outcomes
-without actually running case, and it does pretty well around frontier points.
+without actually running cases, and it does pretty well around frontier points.
 
 Unfortunately Ax only supports linear parameter constraints so we have to look for other ways to enforce
-the relationship between the tilting angle and height of the blades with the shaft radius.
+the relationship between the blade tilting angle and height of the blades with the shaft radius.
