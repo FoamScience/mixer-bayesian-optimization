@@ -197,8 +197,12 @@ we can clearly see that the model has much more confidence in `bladeDurability`:
 
 ![](./plots/TM_Objectives.png)
 
-Loading the visualizer UI on this optimization can easily show how much the objectives would be affected
-by changing various parameter values. It's important to understand that this analysis is only valid
+Loading the visualizer UI on this optimization allows to
+
+- Pick an objective to focus the analysis on
+- Explore how much the objectives would be affected by changing various parameter values.
+
+It's important to understand that this analysis is only valid
 around the Pareto frontier points, hence the display of confidence intervals:
 
 ![](./plots/TM_Analysis.png)
