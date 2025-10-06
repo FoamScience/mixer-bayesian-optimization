@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [ "foamlib>=1.3.11", "pymadcad>=0.19.1", "numpy-stl>=3.2.0" ]
+# ///
+
 ## Constant parts: outer wall, AMI interface patch, inner & outer outlets
 ##                 inner & outer inlets
 ## Parameter space for CAD design:
@@ -8,14 +13,12 @@
 ## - blade radius, height, and tilting angle
 ## - nbr of blades per propeller 
 
-
 import os, math
 from stl import Mode
 from madcad import *
-from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+from foamlib import FoamFile
 
-cadDictPath = "./constant/cadDict"
-cadDict = ParsedParameterFile(name=cadDictPath)
+cadDict = FoamFile("./constant/cadDict")
 
 ### General settings
 radRes = ('rad', 0.01)
@@ -26,13 +29,13 @@ shaft_base = Circle((O, Z), cadDict["shaft"]["radius"], resolution=radRes)
 print(f"Generating shaft; radius = {cadDict['shaft']['radius']}; height = {cadDict['shaft']['height']}")
 partial_trans = vec3(0,0, cadDict["shaft"]["height"])/fixRes[1]
 shaft = repeat(
-        extrusion(line=web(shaft_base), trans=transform(partial_trans)),
+        extrusion(web(shaft_base), transform(partial_trans)),
         fixRes[1],
         partial_trans)
 shaft.finish()
 write(mesh=shaft, name='shaft', type="stl", mode=Mode.ASCII)
 os.rename('shaft', './constant/triSurface/shaft.stl')
-shaft_hole = extrusion(partial_trans*fixRes[1], flatsurface(shaft_base).flip(), alignment=0.5)
+shaft_hole = extrusion(flatsurface(shaft_base).flip(), partial_trans*fixRes[1], alignment=0.7)
 
 ### 2. Generate stator blades
 def gen_stator_blades():
@@ -43,8 +46,8 @@ def gen_stator_blades():
         A = vec3(cadDict["stator"]["blades"]["radius"]/2.0, 0, 0)
         s_blade_base = Segment(-A, A)
         s_blade = extrusion(
-            line=web(s_blade_base),
-            trans=transform(vec3(0,0,cadDict["stator"]["blades"]["height"]))
+            web(s_blade_base),
+            vec3(0,0,cadDict["stator"]["blades"]["height"])
         ).transform(
             vec3(cadDict["stator"]["blades"]["distanceFromCenter"], 0, 0)
         ).transform(

@@ -1,13 +1,24 @@
-#!/bin/bash
-source "$1/etc/bashrc"
+#!/usr/bin/env bash
+
+if [ -z "$WM_PROJECT" ]; then
+    echo "Must source and OpenCFD OpenFOAM version for this to work!"
+    exit 1
+fi
+
+if [ ! -d "$1" ];  then
+    echo "Must pass in the scripts folder as first argument"
+    exit 1
+fi
+scripts_folder="$1"
+
 cd "${0%/*}" || exit                                # Run from this directory
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
 #------------------------------------------------------------------------------
 
 set -e
 touch case.foam
-runApplication ./update-controlDict.py
-runApplication ./geometry/generate.py
+uv run --script "$scripts_folder"/update-controlDict.py
+uv run --script "$scripts_folder"/generate.py
 runApplication surfaceFeatureExtract
 runApplication blockMesh
 runApplication snappyHexMesh -overwrite

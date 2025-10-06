@@ -5,3 +5,7 @@ outputs
 *json
 *html
 *csv
+artifacts/
+!plots/*html
+!plots/*csv
+log.*

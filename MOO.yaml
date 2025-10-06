@@ -1,0 +1,102 @@
+version: 1.1.0
+experiment:
+  name: ThermalMixer
+  description: Sample experiment description
+  parameters:
+    - name: angularVelocity
+      parameter_type: int
+      bounds: [10, 40]
+    - name: nRotorBlades
+      parameter_type: int
+      values: [3, 4, 5, 6]
+      is_ordered: True
+    - name: rotorBladeRadius
+      parameter_type: float
+      bounds: [0.01, 0.02] 
+    - name: rotorBladeHeight
+      parameter_type: float
+      bounds: [0.03, 0.05]
+    - name: rotorBladeTiltAngle
+      parameter_type: float
+      bounds: [0, 14] # some of these angles will not be feasible
+  parameter_constraints: []
+trial_generation:
+  method: fast
+existing_trials:
+  file_path: ''
+baseline:
+  parameters:
+    angularVelocity: 25
+    nRotorBlades: 4
+    rotorBladeRadius: 0.01
+    rotorBladeHeight: 0.04
+    rotorBladeTiltAngle: 9
+optimization:
+  metrics:
+  - name: PowerConsumption
+    progress: "/tmp/data/scripts/obj3_power_consumption.sh"
+    command: "/tmp/data/scripts/obj3_power_consumption.sh"
+    lower_is_better: True
+  - name: MixingQuality
+    progress: "/tmp/data/scripts/obj2_mixing_quality.sh"
+    command: "/tmp/data/scripts/obj2_mixing_quality.sh"
+    lower_is_better: True
+  - name: BladeDurability
+    progress: []
+    command: "/tmp/data/scripts/obj1_blade_durability.sh"
+  objective: "-PowerConsumption, -MixingQuality, -BladeDurability"
+  outcome_constraints:
+  - PowerConsumption <= 1.1*baseline
+  - MixingQuality <= 1.1*baseline
+  - BladeDurability <= 1.1*baseline
+  case_runner:
+    template_case: ./annularThermalMixer
+    mode: local
+    runner: "./Allrun /tmp/data/scripts"
+    log_runner: true
+    remote_status_query: ""
+    remote_early_stop: ""
+    trial_destination: /tmp/data/trials
+    artifacts_folder: ./artifacts
+    file_substitution: []
+    variable_substitution:
+    - file: /constant/caseSettings
+      parameter_scopes:
+        angularVelocity: "meshMotionProperties.omega"
+    - file: /constant/cadDict
+      parameter_scopes:
+        nRotorBlades: "rotor.blades.n"
+        rotorBladeRadius: "rotor.blades.radius"
+        rotorBladeHeight: "rotor.blades.height"
+        rotorBladeTiltAngle: "rotor.blades.tiltAngle"
+orchestration_settings:
+  max_trials: 60
+  parallelism: 4
+  initial_seconds_between_polls: 180
+  seconds_between_polls_backoff_factor: 1.0
+  tolerated_trial_failure_rate: 0.5
+  timeout_hours: 48
+  ttl_seconds_for_trials: 3600
+  global_stopping_strategy:
+    min_trials: 20
+    window_size: 10
+    improvement_bar: 0.3
+  early_stopping_strategy:
+    type: or
+    left:
+      type: percentile
+      metric_names: ["MixingQuality"]
+      percentile_threshold: 25
+      min_progression: 3
+      trial_indices_to_ignore: !range [0, 20]
+    right:
+      type: percentile
+      metric_names: ["PowerConsumption"]
+      percentile_threshold: 25
+      min_progression: 3
+      trial_indices_to_ignore: !range [0, 20]
+store:
+  read_from: nowhere
+  save_to: json
+  backend_options:
+    url: null
