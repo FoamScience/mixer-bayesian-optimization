@@ -24,6 +24,7 @@ stator
 {
     blades
     {
+        thickness 0.0015;
         radius 0.02;
         height 0.2;
         distanceFromCenter 0.09;
@@ -35,11 +36,13 @@ rotor
 {
     blades
     {
+        thickness 0.0015;
         radius 0.0125;
         height 0.04;
-        tiltAngle 15; // [0, 90] but subject to constrains related to blade height & shaft radius
+        tiltAngle 15;
         n 4;
     }
 }
+// rotor.blades.titleAngle [0, 90] but subject to constrains related to blade height & shaft radius
 
 // ************************************************************************* //

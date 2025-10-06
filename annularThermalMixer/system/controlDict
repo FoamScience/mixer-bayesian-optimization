@@ -28,15 +28,15 @@ deltaT          1e-3;
 
 writeControl    adjustable;
 
-writeInterval   0.02;
+writeInterval   0.04;
 
-purgeWrite      0;
+purgeWrite      1;
 
 writeFormat     ascii;
 
 writePrecision  6;
 
-writeCompression off;
+writeCompression on;
 
 timeFormat      general;
 
@@ -78,16 +78,15 @@ functions
         writePropellerPerformance yes;
 
         // Propeller data:
-        // Radius
-        radius          0.025;
         rotationMode    specified; // specified | MRF
         // rotationMode = specified:
         origin          (0 0 0);
-        n               25; // revolutions per second = rad/s / 2pi
+        n 3.9788735772973833; // revolutions per second = rad/s / 2pi
         axis            (0 0 1);
         // Optionally write wake text files
         // Note: controlled by writeControl
         writeWakeFields no;
+        radius 0.025;
     }
 
     erosion
